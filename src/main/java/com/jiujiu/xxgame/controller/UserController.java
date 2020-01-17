@@ -25,8 +25,8 @@ public class UserController {
         model.put("list", list);
         return list;
     }
-	
 
+    @RequestMapping("/user/login")
     public LoginResult login(String token, String uid){
         userService.checkLogin(token, uid);
         LoginResult result = new LoginResult();
