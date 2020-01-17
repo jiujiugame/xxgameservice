@@ -27,8 +27,8 @@ public class UserController {
     }
 
     @RequestMapping("/user/login")
-    public LoginResult login(String token, String uid){
-        userService.checkLogin(token, uid);
+    public LoginResult login(String token){
+        userService.checkLogin(token);
         LoginResult result = new LoginResult();
         result.setBoard("[]");
         result.setS2c_code(200);
