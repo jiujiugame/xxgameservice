@@ -3,13 +3,23 @@ package com.jiujiu.xxgame.model;
 public class User {
 
 	private String token;
-	
+
+	private String name;
+
 	private String tokenType;
 	
-	public User(String token, String tokenType) {
-		super();
+	public User(String name, String token, String tokenType) {
+		this.name = name;
 		this.token = token;
 		this.tokenType = tokenType;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	public String getToken() {
