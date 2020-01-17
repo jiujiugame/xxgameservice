@@ -30,9 +30,18 @@ public class UserService {
 
     public LoginResult checkLogin(String token, String uid) {
         LoginResult result = new LoginResult();
-        result.setToken(RedisKeys.newToken());
 
-        User user = new User(uid);
+        JiuJiuUser juser = this.getJiuJiuUser(token);
+        if(juser == null || juser.getUid() == null) {
+        	result.setNewUid("");
+        	result.setS2c_code(-1);
+        	result.setS2c_msg("啾啾登录失效，请重新登录。");
+        	return result;
+        }
+        
+        result.setToken(RedisKeys.newToken());
+        result.setNewUid(juser.getUid());
+        User user = new User(juser.getUid());
 
         Jedis jedis = RedisClient.getJedis();
         try {
@@ -55,14 +64,12 @@ public class UserService {
         return result;
     }
 
-
-
     private static class JiuJiuResp {
         private int status;
 
         private String message;
 
-        private Account account;
+        private Account data;
 
         public int getStatus() {
             return status;
@@ -80,12 +87,12 @@ public class UserService {
             this.message = message;
         }
 
-        public Account getAccount() {
-            return account;
+        public Account getData() {
+            return data;
         }
 
-        public void setAccount(Account account) {
-            this.account = account;
+        public void setData(Account data) {
+            this.data = data;
         }
 
         static class Account {
@@ -104,7 +111,9 @@ public class UserService {
     public JiuJiuUser getJiuJiuUser(String token) {
         CloseableHttpClient client = HttpClientBuilder.create().build();
         HttpPost post = new HttpPost("https://www.jiujiuapp.cn/app/api/userinfo");
-        post.setHeader("Authorization", "Bearer " + token);
+        post.setHeader("Authorization", token);
+        post.setHeader("Accept-Charset", "UTF-8");
+        post.setHeader("Content-Type", "application/x-www-form-urlencoded");
 
         try(CloseableHttpResponse response = client.execute(post)) {
             if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
@@ -115,15 +124,22 @@ public class UserService {
                     Gson gson = new Gson();
                     JiuJiuResp jjresp = gson.fromJson(resp, JiuJiuResp.class);
                     if(jjresp.status == 1) {
-                        return jjresp.getAccount().getAccount();
+                        return jjresp.getData().getAccount();
                     } else
                         return null;
                 }
             }
         } catch (Exception e) {
+        	e.printStackTrace();
             logger.error("http requet error", e);
         }
         return null;
+    }
+    
+    public static void main(String[] args) {
+//    	String url = "https://jiujiuapp.cn/app/oauth/authorize?client_id=mmm&redirect_uri=https://www.baidu.com&response_type=token";
+    	UserService service = new UserService();  
+    	System.out.println(service.getJiuJiuUser("bearer edc6be36-76a3-4a77-a087-42e9f840bd5b"));
     }
 
 

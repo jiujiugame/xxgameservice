@@ -1,9 +1,8 @@
 package com.jiujiu.xxgame.model;
 
-
 public class JiuJiuUser {
 
-    private String uuid;
+    private String uid;
 
     private String gender;
 
@@ -11,12 +10,12 @@ public class JiuJiuUser {
 
     private String userName;
 
-    public String getUuid() {
-        return uuid;
+    public String getUid() {
+        return uid;
     }
 
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
+    public void setUuid(String uid) {
+        this.uid = uid;
     }
 
     public String getGender() {
@@ -42,4 +41,11 @@ public class JiuJiuUser {
     public void setUserName(String userName) {
         this.userName = userName;
     }
+
+	@Override
+	public String toString() {
+		return "JiuJiuUser [uid=" + uid + ", gender=" + gender + ", avatarUrl=" + avatarUrl + ", userName=" + userName
+				+ "]";
+	}
+    
 }
