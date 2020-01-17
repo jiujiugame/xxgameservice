@@ -28,10 +28,10 @@ public class UserService {
 
     private Logger logger = LoggerFactory.getLogger(UserService.class);
 
-    public LoginResult checkLogin(String token, String uid) {
+    public LoginResult checkLogin(String tokenHeader) {
         LoginResult result = new LoginResult();
 
-        JiuJiuUser juser = this.getJiuJiuUser(token);
+        JiuJiuUser juser = this.getJiuJiuUser(tokenHeader);
         if(juser == null || juser.getUid() == null) {
         	result.setNewUid("");
         	result.setS2c_code(-1);
@@ -45,7 +45,7 @@ public class UserService {
 
         Jedis jedis = RedisClient.getJedis();
         try {
-            String accountKey = RedisKeys.getAccountKey(uid);
+            String accountKey = RedisKeys.getAccountKey(juser.getUid());
             String tokenKey = RedisKeys.getTokenKey(result.getToken());
             if(jedis.exists(accountKey)) {
                 //LOGIN:
@@ -60,7 +60,7 @@ public class UserService {
             jedis.close();
         }
 
-        System.out.println("checkLogin failed:" + token);
+        System.out.println("checkLogin failed:" + tokenHeader);
         return result;
     }
 
@@ -108,10 +108,10 @@ public class UserService {
         }
     }
 
-    public JiuJiuUser getJiuJiuUser(String token) {
+    public JiuJiuUser getJiuJiuUser(String tokenHeader) {
         CloseableHttpClient client = HttpClientBuilder.create().build();
         HttpPost post = new HttpPost("https://www.jiujiuapp.cn/app/api/userinfo");
-        post.setHeader("Authorization", token);
+        post.setHeader("Authorization", tokenHeader);
         post.setHeader("Accept-Charset", "UTF-8");
         post.setHeader("Content-Type", "application/x-www-form-urlencoded");
 
