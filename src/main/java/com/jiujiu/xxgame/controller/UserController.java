@@ -1,7 +1,5 @@
 package com.jiujiu.xxgame.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,7 +19,7 @@ public class UserController {
         return list;
     }
 	
-	@RequestMapping("/user/login")
+	@PostMapping("/user/login")
     public List<User> login(String token){
 		List<User> list=new ArrayList<>();
         System.out.print("你好 home ");
