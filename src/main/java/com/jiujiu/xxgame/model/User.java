@@ -2,40 +2,58 @@ package com.jiujiu.xxgame.model;
 
 public class User {
 
-	private String token;
+	private String uid;
 
-	private String name;
-
-	private String tokenType;
+	private String os = "";
 	
-	public User(String name, String token, String tokenType) {
-		this.name = name;
-		this.token = token;
-		this.tokenType = tokenType;
+	private String channel = "";
+
+	private String mac = "";
+	
+	public User(String uid) {
+		super();
+		this.uid = uid;
 	}
 
-	public String getName() {
-		return name;
+	public String getUid() {
+		return uid;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setUid(String uid) {
+		this.uid = uid;
 	}
 
-	public String getToken() {
-		return token;
+	public String getOs() {
+		return os;
 	}
 
-	public void setToken(String token) {
-		this.token = token;
+	public void setOs(String os) {
+		this.os = os;
 	}
 
-	public String getTokenType() {
-		return tokenType;
+	public String getChannel() {
+		return channel;
 	}
 
-	public void setTokenType(String tokenType) {
-		this.tokenType = tokenType;
+	public void setChannel(String channel) {
+		this.channel = channel;
 	}
 
+	public String getMac() {
+		return mac;
+	}
+
+	public void setMac(String mac) {
+		this.mac = mac;
+	}
+
+	@Override
+	public String toString() {
+		return "{" +
+				"uid='" + uid + '\'' +
+				", os='" + os + '\'' +
+				", channel='" + channel + '\'' +
+				", mac='" + mac + '\'' +
+				'}';
+	}
 }
