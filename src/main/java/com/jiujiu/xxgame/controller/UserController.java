@@ -1,5 +1,6 @@
 package com.jiujiu.xxgame.controller;
 
+import com.jiujiu.xxgame.model.JiuJiuUser;
 import com.jiujiu.xxgame.model.LoginResult;
 import com.jiujiu.xxgame.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,15 +20,15 @@ public class UserController {
 
 	@RequestMapping("/user/index")
     public List<User> getIndexPage(ModelMap model){
-        List<User> list=new ArrayList<>();
+        List<User> list = new ArrayList<>();
         list.add(new User("GHSIUDIU276"));
         model.put("list", list);
         return list;
     }
-	
-	@RequestMapping("/user/login")
-    public LoginResult login(String token, String uid){
-        userService.checkLogin(token, uid);
+
+    @RequestMapping("/user/login")
+    public LoginResult login(String token){
+        userService.checkLogin(token);
         LoginResult result = new LoginResult();
         result.setBoard("[]");
         result.setS2c_code(200);
