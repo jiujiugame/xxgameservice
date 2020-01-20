@@ -4,7 +4,7 @@ public class User {
 
 	private String uid;
 
-	private String os = "";
+	private String os = "0";
 	
 	private String channel = "";
 
@@ -50,10 +50,10 @@ public class User {
 	@Override
 	public String toString() {
 		return "{" +
-				"uid='" + uid + '\'' +
-				", os='" + os + '\'' +
-				", channel='" + channel + '\'' +
-				", mac='" + mac + '\'' +
+				"\"uid\" : \"" + uid + "\"" +
+				",\"os\" : \"" + os + "\"" +
+				",\"channel\" : \"" + channel + "\"" +
+				",\"mac\" : \"" + mac + "\"" +
 				'}';
 	}
 }

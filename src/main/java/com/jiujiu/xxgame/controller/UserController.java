@@ -27,14 +27,8 @@ public class UserController {
     }
 
     @RequestMapping("/user/login")
-    public LoginResult login(String token){
-        userService.checkLogin(token);
-        LoginResult result = new LoginResult();
-        result.setBoard("[]");
-        result.setS2c_code(200);
-        result.setNewUid("FHA-ASKJH-ASJ");
-        result.setToken("0d87425f-44b1-4e22-b85b-482fcb6e3048");
-        return result;
+    public LoginResult login(String jiujiuToken){
+        return userService.checkLogin(jiujiuToken);
     }
 
 }

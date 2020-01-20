@@ -10,6 +10,9 @@ public class RedisKeys {
     public static final String KEY_SERVER_LOGIN = "/server/login";
     public static final String KEY_DATA_ONLINECOUNT = "data.OnlineCount";
     public static final String KEY_PLAYER_SERVERS_PREFIX = "/player/servers/";
+    public static final String KEY_SERVER_LIST = "/serverlist/80";
+    public static final String KEY_AREA_LIST = "/arealist/80";
+
 
     public static String getTokenKey(final String token) {
         return KEY_TOEKN_PREFIX + token;

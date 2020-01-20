@@ -1,11 +1,7 @@
 package com.jiujiu.xxgame.service;
 
 import com.google.gson.Gson;
-import com.jiujiu.xxgame.model.JiuJiuUser;
-import com.jiujiu.xxgame.model.Load;
-import com.jiujiu.xxgame.model.LoginResult;
-import com.jiujiu.xxgame.model.OnlineStats;
-import com.jiujiu.xxgame.model.User;
+import com.jiujiu.xxgame.model.*;
 
 import com.jiujiu.xxgame.redis.RedisClient;
 import com.jiujiu.xxgame.redis.RedisKeys;
@@ -22,6 +18,7 @@ import org.springframework.stereotype.Component;
 import redis.clients.jedis.Jedis;
 
 import java.io.InputStream;
+import java.util.*;
 
 @Component
 public class UserService {
@@ -30,38 +27,88 @@ public class UserService {
 
     public LoginResult checkLogin(String tokenHeader) {
         LoginResult result = new LoginResult();
-
+        System.out.println("tokenHeader:"+tokenHeader);
         JiuJiuUser juser = this.getJiuJiuUser(tokenHeader);
-        if(juser == null || juser.getUid() == null) {
-        	result.setNewUid("");
-        	result.setS2c_code(-1);
-        	result.setS2c_msg("啾啾登录失效，请重新登录。");
-        	return result;
+        if (juser == null || juser.getUid() == null) {
+            result.setNewUid("");
+            result.setS2c_code(-1);
+            result.setS2c_msg("啾啾登录失效，请重新登录。");
+            return result;
         }
-        
+
         result.setToken(RedisKeys.newToken());
         result.setNewUid(juser.getUid());
+//        result.setNewBid(RedisKeys.newToken());
         User user = new User(juser.getUid());
+//        user.setMac(mac);
 
         Jedis jedis = RedisClient.getJedis();
         try {
             String accountKey = RedisKeys.getAccountKey(juser.getUid());
-            String tokenKey = RedisKeys.getTokenKey(result.getToken());
-            if(jedis.exists(accountKey)) {
+//            String tokenKey = RedisKeys.getTokenKey(result.getToken());
+            jedis.select(2);
+            if (jedis.exists(accountKey)) {
                 //LOGIN:
+                String bid = jedis.get(accountKey);
+                result.setToken(bid);
             } else {
                 //REG:
-                jedis.set(accountKey, "$%^#$%#asGS$%!@134234");
+                jedis.set(accountKey, result.getToken());
             }
-            jedis.setex(tokenKey, 600, user.toString());
-            jedis.publish(RedisKeys.KEY_SERVER_LOGIN, new Load().toString());
-            jedis.publish(RedisKeys.KEY_DATA_ONLINECOUNT, new OnlineStats().toString());
+//            jedis.setex(tokenKey, 600, user.toString());
+//            jedis.select(3);
+//            jedis.publish(RedisKeys.KEY_SERVER_LOGIN, new Load().toString());
+//            jedis.publish(RedisKeys.KEY_DATA_ONLINECOUNT, new OnlineStats().toString());
         } finally {
             jedis.close();
         }
 
-        System.out.println("checkLogin failed:" + tokenHeader);
+        result.setBoard(this.readServerList());
+//        System.out.println("checkLogin failed:" + tokenHeader);
         return result;
+    }
+
+
+    public String readServerList() {
+        Jedis jedis = RedisClient.getJedis();
+        try {
+            jedis.select(2);
+            Map<String, String> areas = jedis.hgetAll(RedisKeys.KEY_AREA_LIST);
+            Map<String, List<Server>> vals = new HashMap<>();
+
+            Map<String, String> servers = jedis.hgetAll(RedisKeys.KEY_SERVER_LIST);
+
+            for(String key : areas.keySet()){
+                vals.put(key, new ArrayList<Server>());
+            }
+
+            for(String key : servers.keySet()){
+                String value = servers.get(key);
+                Gson gson = new Gson();
+                Server server = gson.fromJson(value, Server.class);
+                System.out.println(server.getServerString());
+                List serverList = vals.get(server.getAreaId().toString());
+                serverList.add(server);
+                vals.put(server.getAreaId().toString(), serverList);
+            }
+            StringBuilder sb = new StringBuilder();
+            sb.append("[");
+            for(String key : vals.keySet()){
+                sb.append("{\"服务器\":[");
+                List<Server> servList = vals.get(key);
+                for(Server s : servList) {
+                    sb.append(s.getServerString());
+                }
+                sb.append("]},");
+            }
+            sb.append("]");
+            return sb.toString();
+        } catch(Exception e) {
+            e.printStackTrace();
+            return "";
+        } finally {
+            jedis.close();
+        }
     }
 
     private static class JiuJiuResp {
@@ -138,9 +185,9 @@ public class UserService {
     
     public static void main(String[] args) {
 //    	String url = "https://jiujiuapp.cn/app/oauth/authorize?client_id=mmm&redirect_uri=https://www.baidu.com&response_type=token";
-    	UserService service = new UserService();  
-    	System.out.println(service.getJiuJiuUser("bearer edc6be36-76a3-4a77-a087-42e9f840bd5b"));
+    	UserService service = new UserService();
+//    	System.out.println(service.getJiuJiuUser("bearer edc6be36-76a3-4a77-a087-42e9f840bd5b"));
+        System.out.println(service.readServerList());
     }
-
 
 }

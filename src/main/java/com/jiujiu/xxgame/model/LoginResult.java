@@ -5,6 +5,7 @@ public class LoginResult {
     private Integer s2c_code = 200;
     private String s2c_msg = "Successfully!";
     private String newUid = "";
+//    private String newBid = "";
     private String board = "";
     private String token = "";
 
@@ -48,4 +49,11 @@ public class LoginResult {
         this.board = board;
     }
 
+//    public String getNewBid() {
+//        return newBid;
+//    }
+//
+//    public void setNewBid(String newBid) {
+//        this.newBid = newBid;
+//    }
 }
