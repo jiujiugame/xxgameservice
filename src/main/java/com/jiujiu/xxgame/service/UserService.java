@@ -8,16 +8,20 @@ import com.jiujiu.xxgame.redis.RedisKeys;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpStatus;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import redis.clients.jedis.Jedis;
 
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.*;
 
 @Component
@@ -182,12 +186,56 @@ public class UserService {
         }
         return null;
     }
+
+    public static List<NameValuePair> transformMap(Map<String, String> params) {
+        if (params == null || params.size() < 0) {// 如果参数为空则返回null;
+            return new ArrayList<NameValuePair>();
+        }
+        List<NameValuePair> paramList = new ArrayList<NameValuePair>();
+        for (Map.Entry<String, String> map : params.entrySet()) {
+            paramList.add(new BasicNameValuePair(map.getKey(), map.getValue()));
+        }
+        return paramList;
+    }
     
-    public static void main(String[] args) {
+    public static void main(String[] args) throws UnsupportedEncodingException {
 //    	String url = "https://jiujiuapp.cn/app/oauth/authorize?client_id=mmm&redirect_uri=https://www.baidu.com&response_type=token";
-    	UserService service = new UserService();
+//    	UserService service = new UserService();
 //    	System.out.println(service.getJiuJiuUser("bearer edc6be36-76a3-4a77-a087-42e9f840bd5b"));
-        System.out.println(service.readServerList());
+//        System.out.println(service.readServerList());
+
+        CloseableHttpClient client = HttpClientBuilder.create().build();
+        HttpPost post = new HttpPost("http://xx1.jiujiuapp.cn:8099/xmds-gm/action/execute");
+//        post.setHeader("Authorization", tokenHeader);
+        post.setHeader("Accept-Charset", "UTF-8");
+        post.setHeader("Content-Type", "application/x-www-form-urlencoded");
+
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("type","2030");
+        params.put("value","[\"name\",\"big胖\",\"106\"]");
+        params.put("servers","123");
+        List<NameValuePair> paramList = transformMap(params);
+        UrlEncodedFormEntity formEntity = new UrlEncodedFormEntity(paramList, "utf8");
+        post.setEntity(formEntity);
+
+        try(CloseableHttpResponse response = client.execute(post)) {
+            if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+                HttpEntity httpEntity = response.getEntity();
+                try (InputStream inputStream = httpEntity.getContent()) {
+                    String resp = IOUtils.toString(inputStream, "UTF-8");
+                    Gson gson = new Gson();
+                    System.out.println(resp);
+//                    JiuJiuResp jjresp = gson.fromJson(resp, JiuJiuResp.class);
+//                    if(jjresp.status == 1) {
+//                        return jjresp.getData().getAccount();
+//                    } else
+//                        return null;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+//            logger.error("http requet error", e);
+        }
     }
 
 }

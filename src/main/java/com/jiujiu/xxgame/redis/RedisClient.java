@@ -1,5 +1,6 @@
 package com.jiujiu.xxgame.redis;
 
+import com.alibaba.fastjson.JSON;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
@@ -8,7 +9,9 @@ import java.util.Set;
 
 public class RedisClient {
 
-    private static String IP = "192.168.18.66";
+    private static String IP = "xx1.jiujiuapp.cn";
+//    private static String IP = "127.0.0.1";
+
     private static int PORT = 6379;
 
     private static int MAX_ACTIVE = 100;
@@ -86,11 +89,11 @@ public class RedisClient {
         return res;
     }
 
-    private static Jedis jedis;
-    static {
-        jedis = new Jedis("192.168.18.66", 6379);
-//        jedis.auth("123456");
-    }
+//    private static Jedis jedis;
+//    static {
+//        jedis = new Jedis("127.0.0.1", 6379);
+////        jedis.auth("123456");
+//    }
 
     public static void main(String[] args) {
         Jedis jedis = RedisClient.getJedis();
